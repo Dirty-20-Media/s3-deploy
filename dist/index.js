@@ -974,8 +974,9 @@ async function run() {
     const distId = core.getInput('dist-id');
     const invalidation = core.getInput('invalidation') || '/';
     const deleteRemoved = core.getInput('delete-removed') || false;
+    const private = core.getInput('private') || false;
 
-    await deploy({ folder, bucket, bucketRegion, distId, invalidation, deleteRemoved });
+    await deploy({ folder, bucket, bucketRegion, distId, invalidation, deleteRemoved, private });
   } catch (error) {
     core.setFailed(error.message);
   }
@@ -1008,9 +1009,10 @@ const exec = __webpack_require__(986);
 
 let deploy = function (params) {
   return new Promise((resolve, reject) => {
-    const { folder, bucket, bucketRegion, distId, invalidation, deleteRemoved } = params;
+    const { folder, bucket, bucketRegion, distId, invalidation, deleteRemoved, private } = params;
 
     const deleteRemovedArg = deleteRemoved ? `--deleteRemoved ${deleteRemoved}` : '';
+    const privateArg = private ? '--private' : '';
 
     try {
       const command = `npx s3-deploy@1.4.0 ./** \
@@ -1022,7 +1024,8 @@ let deploy = function (params) {
                         --gzip xml,html,htm,js,css,ttf,otf,svg,txt \
                         --invalidate "${invalidation}" \
                         --noCache \
-                        ${deleteRemovedArg} `;
+                        ${deleteRemovedArg} \
+                        ${privateArg} `;
 
       const cwd = path.resolve(folder);
       exec.exec(command, [], { cwd }).then(resolve).catch(reject);
