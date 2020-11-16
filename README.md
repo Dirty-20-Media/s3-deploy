@@ -6,10 +6,10 @@ This action is based on the work done by import-io on [s3-deploy](https://github
 
 ## Usage
 
-You can use this action by referencing the v2 branch
+You can use this action by referencing the v3 branch
 
 ```yaml
-uses: reggionick/s3-deploy@v2
+uses: reggionick/s3-deploy@v3
 with:
     folder: build
     bucket: ${{ secrets.S3_BUCKET }}
@@ -28,6 +28,8 @@ Input              | Type             | Required | Default      | Description
 | `dist-id`        | string           | Yes      |              | The CloudFront Distribution ID to invalidate
 | `invalidation`   | string           | No       | '/'          | The CloudFront Distribution path(s) to invalidate
 | `delete-removed` | boolean / string | No       | false        | Removes files in S3, that are not available in the local copy of the directory 
+| `noCache`        | boolean          | No       | false        | Use this parameter to specify `Cache-Control: no-cache, no-store, must-revalidate` header 
+| `private`        | boolean          | No       | false        | Upload files with private ACL, needed for S3 static website hosting
 
 
 ### Example `workflow.yml` with S3 Deploy Action
@@ -51,7 +53,7 @@ jobs:
           run: yarn build
 
         - name: Deploy
-          uses: reggionick/s3-deploy@v2
+          uses: reggionick/s3-deploy@v3
           with:
             folder: build
             bucket: ${{ secrets.S3_BUCKET }}
@@ -59,6 +61,8 @@ jobs:
             dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
             invalidation: /
             delete-removed: true
+            no-cache: true
+            private: true
 ```
 
 ## License
